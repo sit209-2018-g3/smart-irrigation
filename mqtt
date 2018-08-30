@@ -1,0 +1,110 @@
+const mqtt = require('mqtt');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const randomInt = require('random-int');
+
+mongoose.connect(process.env.MONGO_URL);
+
+const Device = require('./models/device');
+const ActuatorDevice = require ('./models/actuatorDevice');
+const SensorDevice = require ('./models/sensorDevice');
+
+const app = express();
+
+const { URL, USER, PASSWORD } = process.env;
+const port = process.env.PORT || 5001;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+app.use(function(req,res,next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+const client = mqtt.connect(URL, {
+    username: USER,
+    password: PASSWORD
+});
+
+client.on('connect', () => {
+    console.log('mqtt connected');
+    client.subscribe('/#');
+});
+
+client.on('message', (topic, message) => {
+    if (topic == '/mqtt-data/moisture') {
+        const data = JSON.parse(message);
+        
+        SensorDevice.findOne({"id": data.id}, (err, device) => {
+            if (err) {
+                console.log(err)
+            }
+
+            const {sensorData} = device;
+            const { ts, moisture } = data;
+
+            sensorData.push({ ts, moisture });
+            device.sensorData = sensorData;
+
+            device.save(err => {
+                if (err){
+                    console.log(err)
+                }
+            });
+        });
+    } else if (topic == '/myactuator') {
+        const data = JSON.parse(message);
+        
+        SensorDevice.findOne({"id": data.id}, (err, device) => {
+            if (err) {
+                console.log(err)
+            }
+
+        const topic = `/sensor/${device.id}/config`;
+        const command = device.parentActuator;
+        client.publish(topic,command);
+        
+        });
+    } else if (topic == '/mysensors') {
+        const data = JSON.parse(message);
+        
+        ActuatorDevice.findOne({"id": data.id}, (err, actdevice) => {
+            if (err) {
+                console.log(err)
+            } else {
+                SensorDevice.findOne({"parentActuator": actdevice.actuatorName}, (err,sendevice) => {
+                    if (err) {
+                        console.log(err)
+                    }
+
+                    const topic = `/actuator/${actdevice.id}/config`;
+                    const command = sendevice.id;
+                    client.publish(topic,command);
+                });
+            }
+
+        
+        /*const topic = `actuator/${actdevice.id}/config`;
+        const command = 'no sensor';
+        client.publish(topic,command);
+        */
+        });
+    }
+});
+
+app.post('/send-command', (req, res) => {
+    const { deviceId, command } = req.body;
+    const topic = `/command/${deviceId}`;
+    client.publish(topic, command, () => {
+        res.send('published new message');
+    });
+});
+
+app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+});
