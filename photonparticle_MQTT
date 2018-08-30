@@ -1,0 +1,70 @@
+#include "MQTT.h"
+
+int id = 2;
+int ts = 1535359000;
+int led1 = D7;
+int sensorPin = A4;
+
+String mm;
+char* sendMoisture;
+
+void callback(char* topic, byte* payload, unsigned int length);
+
+MQTT client("m13.cloudmqtt.com", 16965, callback);
+
+// recieve message
+void callback(char* topic, byte* payload, unsigned int length) {
+    char p[length + 1];
+    memcpy(p, payload, length);
+    p[length] = NULL;
+    
+    String message(p);
+    
+    mm=message;
+    
+}
+
+
+void setup() {
+    
+    RGB.control(true);
+
+    pinMode(led1, OUTPUT);
+    
+    RGB.control(true);
+
+    // connect to the server
+    client.connect("m13.cloudmqtt.com","oebptugj","yFtO2mJROP9s");
+    
+    if (client.isConnected()) {
+        client.subscribe("/sensor/1/config");
+        delay(1000);
+        client.publish("/myactuator","{ \"id\": \""+String(id)+"\"}");
+    }
+}
+
+void loop() {
+    
+    float moisture;
+    int analogValue;
+    analogValue = analogRead(sensorPin);
+    moisture = ( (analogValue/4095.00) * 100 );
+    
+    //sprintf(sendMoisture,"the percentage of water is %f",moisture);
+    
+    if (client.isConnected()){
+        //client.publish("/mqtt-data/moisture","{ \"id\": \"1\",\"ts\": \"1535359000\",\"moisture\": \"30\"}");
+        client.publish("/1/"+String(id)+"/moisture",String(moisture));
+        client.loop();
+        delay(10000);
+    }
+    
+}
+
+void actuator(String m) {
+    if (m=="ON"){
+        digitalWrite(led1,HIGH);
+    } else {
+        digitalWrite(led1,LOW);
+    }
+}
