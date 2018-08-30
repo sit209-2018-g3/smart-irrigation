@@ -1,0 +1,42 @@
+import paho.mqtt.client as mqtt
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BOARD)
+
+GPIO.setup(10, GPIO.OUT)
+
+MQTT_SERVER = "m13.cloudmqtt.com"
+MQTT_PATH = "/actuator/1/config"
+ID="1"
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe(MQTT_PATH)
+    client.subscribe("/1/2/moisture")
+    time.sleep(5)
+    client.publish("/mysensors","{\"id\": \"1\"}")
+    
+def on_message(client, userdata, msg):
+    if msg.topic == "/actuator/1/config":
+        
+        t=msg.payload.decode("utf-8")
+        print(t)
+    elif msg.topic == "/1/2/moisture":
+        d=msg.payload.decode("utf-8")
+        if float(d) < 20:
+            GPIO.output(10, GPIO.HIGH)
+            print("water on")
+        else:
+            GPIO.output(10, GPIO.LOW)
+            print("water off")
+        
+    
+client = mqtt.Client()
+client.username_pw_set("oebptugj","yFtO2mJROP9s")
+client.connect(MQTT_SERVER, 16965, 60)
+client.on_connect = on_connect
+client.on_message = on_message
+
+
+client.loop_forever()
