@@ -1,0 +1,22 @@
+{
+  "name": "web-api",
+  "version": "0.0.1",
+  "description": "Main web api for Smart Irrigation website.",
+  "main": "api.js",
+  "scripts": {
+    "start": "nodemon -r dotenv/config api.js",
+    "deploy": "now remove 217603898-sit-209 -y && now -p && now alias"
+  },
+  "author": "Brenton Fleming, Lachlan McInnes",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.13"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4",
+    "now": "^11.4.1"
+  }
+}
