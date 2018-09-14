@@ -190,12 +190,12 @@ app.post('/users/:userId/remove-sensor', (req, res) => {
         else {
             let { sensors, controllers } = user;
             sensors = sensors.filter( item => {
-                item.sensorId != sensorId;
+                return item.sensorId != sensorId;
             });
             for (controller of controllers) {
                 if (controller.sensors.includes(sensorId)) {
                     controller.sensors = controller.sensors.filter( item => {
-                        item != sensorId;
+                        return item != sensorId;
                     });
                 }
             }
@@ -299,12 +299,6 @@ app.post('/users/:userId/remove-controller', (req, res) => {
             'message': 'Invalid controller id.'
         });
     }
-    else if (user.userId != userId) {
-        return res.json({
-            'success': false,
-            'message': 'Controller is not registered to current user.'
-        });
-    }
     else {
         controllerId = controllerId.trim();
         User.findOne({ 'controllers': { '$elemMatch': { controllerId } } }, (err, user) => {
@@ -318,6 +312,12 @@ app.post('/users/:userId/remove-controller', (req, res) => {
                         'success': false,
                         'message': 'Controller not found.'
                     });
+            }
+            else if (user.userId != userId) {
+                return res.json({
+                    'success': false,
+                    'message': 'Controller is not registered to current user.'
+                });
             }
             else {
                 let { sensors, controllers } = user;
@@ -525,7 +525,7 @@ app.post('/sensors/:sensorId/unlink', (req, res) => {
             for (controller of controllers) {
                 if (controller.sensors.includes(sensorId)) {
                     controller.sensors = controller.sensors.filter(item => {
-                        item != sensorId;
+                        return item != sensorId;
                     })
                 }
             }
