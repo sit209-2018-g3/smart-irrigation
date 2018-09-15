@@ -31,18 +31,22 @@ class UserStore extends EventEmitter {
         switch (action.type) {
             case "SET_USERID": {
                 this.userId = action.userId;
+                this.emit("change");
                 break;
             }
             case "SET_USERNAME": {
                 this.username = action.username;
+                this.emit("change");
                 break;
             }
             case "SET_FIRSTNAME": {
                 this.firstName = action.firstName;
+                this.emit("change");
                 break;
             }
             case "SET_LASTNAME": {
                 this.lastName = action.lastName;
+                this.emit("change");
                 break;
             }
         }
