@@ -28,6 +28,7 @@ class SensorStore extends EventEmitter {
         switch (action.type) {
             case "SET_SENSORS": {
                 this.sensors = action.sensors;
+                this.emit("change");
                 break;
             }
         }

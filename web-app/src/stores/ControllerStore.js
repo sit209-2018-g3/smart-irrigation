@@ -22,6 +22,7 @@ class ControllerStore extends EventEmitter {
         switch (action.type) {
             case "SET_CONTROLLERS": {
                 this.controllers = action.controllers;
+                this.emit("change");
                 break;
             }
         }
