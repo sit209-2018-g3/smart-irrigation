@@ -1,42 +1,83 @@
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
-import time
+import time, json, chardet
 
-GPIO.setmode(GPIO.BOARD)
-
-GPIO.setup(10, GPIO.OUT)
-
+# define constants
+DEVICE_ID = "c-003"
+DEVICE_PORTS = 4
 MQTT_SERVER = "m13.cloudmqtt.com"
-MQTT_PATH = "/actuator/1/config"
-ID="1"
+
+# configure RPi I/O
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW)
+
+#port and pin dictionary
+pinDict = {1:10,2:12,3:16, 4:18}
+sensDict = {}
+
+# initialise device config
+deviceConfig = []
+
+def get_config(client):
+    # publish mqtt request for config
+    client.publish("/mqtt-config/actuators", json.dumps({"id": DEVICE_ID}))
+    #json.dumps({id: DEVICE_ID})
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe(MQTT_PATH)
-    client.subscribe("/1/2/moisture")
-    time.sleep(5)
-    client.publish("/mysensors","{\"id\": \"1\"}")
-    
+    # subscribe to configuration channel
+    client.subscribe("/actuator/"+DEVICE_ID+"/config")
+    # get config from server
+    get_config(client)
+
 def on_message(client, userdata, msg):
-    if msg.topic == "/actuator/1/config":
+    topic = msg.topic
+    data = json.loads(msg.payload.decode("utf-8"))
+
+    # --- CONFIG MESSAGE RECEIVED ---
+    if topic == "/actuator/"+DEVICE_ID+"/config":
         
-        t=msg.payload.decode("utf-8")
-        print(t)
-    elif msg.topic == "/1/2/moisture":
-        d=msg.payload.decode("utf-8")
-        if float(d) < 20:
-            GPIO.output(10, GPIO.HIGH)
-            print("water on")
-        else:
-            GPIO.output(10, GPIO.LOW)
-            print("water off")
+        print("message recieved")
+        print(data)
+        print(topic)
         
+        sensDict.clear()
+
+        # subscribe sensor channels
+        try:
+            # subscribe all sensor channels
+            for sensor in data:
+                deviceConfig.append(("/" + DEVICE_ID + "/" + sensor['sensor'] + "/moisture",0))
+                print("subscribed to /" + DEVICE_ID + "/" + sensor['sensor'] + "/moisture")
+                
+                sensDict[sensor['sensor']]=sensor['port']
+                
+            client.subscribe(deviceConfig)
+                
+        except:
+            pass
+        
+    # --- DATA MESSAGE RECEIVED ---
+    else:
+        try:
+            
+            # extract sensor id from topic
+            sensorId = topic.split('/')[2]
+            port = sensDict.get(sensorId)
+            
+            if float(data['moisture']) > 25:
+                GPIO.output(pinDict.get(port), GPIO.HIGH)
+                print("hello")
+
+        except:
+            pass
     
 client = mqtt.Client()
 client.username_pw_set("oebptugj","yFtO2mJROP9s")
 client.connect(MQTT_SERVER, 16965, 60)
 client.on_connect = on_connect
 client.on_message = on_message
-
 
 client.loop_forever()
