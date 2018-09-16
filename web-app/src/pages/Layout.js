@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Devices from "../pages/Devices";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import AddSensor from "../pages/AddSensor";
+import Addcontroller from "../pages/AddController";
 
 // Components
 import Navigation from "../components/layout/Navigation";
@@ -19,6 +21,8 @@ class Layout extends Component {
                     <Route exact path="/" component={Devices} />
                     <Route path="/login" component={Login} />
                     <Route path="/register" component={Register} />
+                    <Route path="/add-sensor" component={AddSensor} />
+                    <Route path="/add-controller" component={AddController} />
                     <Footer />
                 </div>
             </Router>
