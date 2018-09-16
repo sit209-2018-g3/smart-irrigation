@@ -48,6 +48,8 @@ class Navigation extends Component {
                         {this.state.isAuthorised
                             ?   <div className="navbar-nav">
                                     <Link className="nav-item nav-link" to="/">Devices</Link>
+                                    <Link className="nav-item nav-link" to = "/add-sensor">Add Sensor</Link>
+                                    <Link className="nav-item nav-link" to = "/add-controller">Add Controller</Link>
                                     <Link className="nav-item nav-link" to="/login" onClick={this.logout}>Logout</Link>
                                 </div>
                             :   <div className="navbar-nav">
