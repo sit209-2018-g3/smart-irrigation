@@ -59,8 +59,12 @@ app.post('/register', (req, res) => {
                     : res.json({
                         'success': true,
                         'message': 'New user created successfully.',
-                        'userId': newUser.userId
-                    })
+                        'userId': user.userId,
+                        'firstName': user.firstName,
+                        'lastName': user.lastName,
+                        'sensors': user.sensors,
+                        'controllers': user.controllers
+                })
             });
         }
     });
