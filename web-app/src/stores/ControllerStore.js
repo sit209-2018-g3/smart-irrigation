@@ -14,7 +14,7 @@ class ControllerStore extends EventEmitter {
 
     getOne(controllerId) {
         return this.controllers.find(item => {
-            item.controllerId == controllerId;
+            return item.controllerId === controllerId;
         });
     }
 
@@ -23,6 +23,9 @@ class ControllerStore extends EventEmitter {
             case "SET_CONTROLLERS": {
                 this.controllers = action.controllers;
                 this.emit("change");
+                break;
+            }
+            default: {
                 break;
             }
         }

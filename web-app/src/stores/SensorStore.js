@@ -14,13 +14,19 @@ class SensorStore extends EventEmitter {
 
     getOne(sensorId) {
         return this.sensors.find(item => {
-            return item.sensorId == sensorId;
+            return item.sensorId === sensorId;
         });
     }
 
     getLinkedTo(controllerId) {
         return this.sensors.filter(item => {
-            return item.controllerId == controllerId;
+            return item.controllerId === controllerId;
+        });
+    }
+
+    getUnlinked() {
+        return this.sensors.filter(item => {
+            return item.controllerId === '';
         });
     }
 
@@ -29,6 +35,9 @@ class SensorStore extends EventEmitter {
             case "SET_SENSORS": {
                 this.sensors = action.sensors;
                 this.emit("change");
+                break;
+            }
+            default: {
                 break;
             }
         }

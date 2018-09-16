@@ -13,6 +13,7 @@ export function setSensors(sensors) {
 export function fetchSensors(userId) {
     axios.get(`${env.API_URL}/users/${userId}/sensors`)
         .then(res => {
+            res = res.data;
             if (res.success) {
                 dispatcher.dispatch({
                     type: "SET_SENSORS",

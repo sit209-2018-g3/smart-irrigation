@@ -5,7 +5,7 @@ import * as env from "../env";
 
 export function setControllers(controllers) {
     dispatcher.dispatch({
-        type: "SET_SENSORS",
+        type: "SET_CONTROLLERS",
         controllers
     });
 }
@@ -13,9 +13,10 @@ export function setControllers(controllers) {
 export function fetchControllers(userId) {
     axios.get(`${env.API_URL}/users/${userId}/controllers`)
         .then(res => {
+            res = res.data;
             if (res.success) {
                 dispatcher.dispatch({
-                    type: "SET_SENSORS",
+                    type: "SET_CONTROLLERS",
                     controllers: res.controllers
                 });
             }
