@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 import axios from 'axios';
 
-export default class Login extends Component {
-    constructor(props) {
-        super (props);
+import * as env from "../env";
+import * as UserActions from "../actions/UserActions";
+
+class Login extends Component {
+    constructor() {
+        super ()
         this.state = {
             username: '',
             password: '',
@@ -24,17 +28,21 @@ export default class Login extends Component {
 
     submit() {
         const { username, password } = this.state;
-        axios.post(`${process.env.API_URL}/authenticate`, { username, password })
+        axios.post(`${env.API_URL}/authenticate`, { username, password })
             .then(res => {
                 res = res.data;
                 if (res.success) {
-                    // Update stores
-                    // Redirect
+                    UserActions.setUserId(res.userId);
+                    UserActions.setFirstName(res.firstName);
+                    UserActions.setLastName(res.LastName);
+                    this.props.history.push("/");
                 }
                 else {
-                    this.state.username = '';
-                    this.state.password = '';
-                    this.state.banner = <div><p className="alert alert-danger">{res.message}</p></div>;
+                    this.setState({
+                        username: '',
+                        password: '',
+                        banner: <div><p className="alert alert-danger">{res.message}</p></div>
+                    });
                 }
             })
             .catch(error => {
@@ -48,14 +56,16 @@ export default class Login extends Component {
                 <h1>Login</h1>
                 {this.state.banner}
                 <div className="form-group">
-                    <label for="user">Username</label>
-                    <input type="text" class="form-control" value={this.state.username} onChange={this.onUsernameChange} />
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" value={this.state.password} onChange={this.onPasswordChange} />
+                    <label htmlFor="user">Username</label>
+                    <input type="text" className="form-control" value={this.state.username} onChange={this.onUsernameChange} />
+                    <label htmlFor="password">Password</label>
+                    <input type="password" className="form-control" value={this.state.password} onChange={this.onPasswordChange} />
                 </div>
                 <button className="btn btn-success" id="submit" onClick={this.submit}>Login</button>
-                <p>Don't have an account? Register <NavLink to="/registration">here</NavLink>.</p>
+                <p>Don't have an account? Register <Link to="/register">here</Link>.</p>
             </div>
         );
     }
 }
+
+export default Login;

@@ -1,6 +1,8 @@
 import axios from "axios";
 import dispatcher from "../dispatcher";
 
+import * as env from "../env";
+
 export function setSensors(sensors) {
     dispatcher.dispatch({
         type: "SET_SENSORS",
@@ -9,7 +11,7 @@ export function setSensors(sensors) {
 }
 
 export function fetchSensors(userId) {
-    axios.get(`${process.env.API_URL}/users/${userId}/sensors`)
+    axios.get(`${env.API_URL}/users/${userId}/sensors`)
         .then(res => {
             if (res.success) {
                 dispatcher.dispatch({

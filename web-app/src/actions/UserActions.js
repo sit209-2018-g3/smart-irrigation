@@ -1,17 +1,12 @@
 import axios from "axios";
 import dispatcher from "../dispatcher";
 
+import * as env from "../env";
+
 export function setUserId(userId) {
     dispatcher.dispatch({
         type: "SET_USERID",
         userId
-    });
-}
-
-export function setUsername(username) {
-    dispatcher.dispatch({
-        type: "SET_USERNAME",
-        username
     });
 }
 
@@ -30,16 +25,13 @@ export function setLastName(lastName) {
 }
 
 export function fetchUser(userId) {
-    axios.get(`${process.env.API_URL}/users/${userId}/details`)
+    axios.get(`${env.API_URL}/users/${userId}/details`)
         .then(res => {
+            res = res.data;
             if (res.success) {
                 dispatcher.dispatch({
                     type: "SET_USERID",
                     userId
-                });
-                dispatcher.dispatch({
-                    type: "SET_USERNAME",
-                    username: res.username
                 });
                 dispatcher.dispatch({
                     type: "SET_FIRSTNAME",

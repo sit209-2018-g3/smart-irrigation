@@ -1,52 +1,49 @@
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import axios from "axios";
 
-export default class Registration extends Component {
-    constructor(props) {
-        super(props);
+import * as env from "../env";
+
+class Register extends Component {
+    constructor() {
+        super()
         this.state = {
             username: '',
             password: '',
             confirmPassword: '',
-            err: false,
-            errMessage: ''
+            banner: <div></div>
         }
-        this.usernameChange = this.usernameChange.bind(this);
-        this.passwordChange = this.passwordChange.bind(this);
-        this.confirmPasswordChange = this.confirmPasswordChange.bind(this);
-        this.register = this.register.bind(this);
+        this.onUsernameChange = this.onUsernameChange.bind(this);
+        this.onPasswordChange = this.onPasswordChange.bind(this);
+        this.onConfirmPasswordChange = this.onConfirmPasswordChange.bind(this);
+        this.submit = this.submit.bind(this);
     }
 
-    usernameChange(e) {
+    onUsernameChange(e) {
         this.setState({ username: e.target.value });
     }
 
-    passwordChange(e) {
+    onPasswordChange(e) {
         this.setState({ password: e.target.value });
     }
 
-    confirmPasswordChange(e) {
+    onConfirmPasswordChange(e) {
         this.setState({ confirmPassword: e.target.value });
     }
 
-    register() {
-        const user = this.state.username;
-        const password = this.state.password;
-        const confirm_password = this.state.confirmPassword;
-        const isAdmin = false;
-        if (password != confirm_password) {
-            this.setState({
-                err: true,
-                errMessage: 'The passwords do not match',
-            })
-        } else {
-            axios.post(`${API_URL}/register`, { user, password, isAdmin })
-                .then(response => {
-                    if (response.success) {
-                        location.href = '/login';
-                    } else {
-                        $('#message').empty();
-                        $('#message').append(`<p class="alert alert-danger">${response.message}</p>`);
+    submit() {
+        const { user, password, confirmPassword } = this.state;
+        if (password !== confirmPassword) {
+            this.setState({banner: <div><p className="alert alert-danger">The entered passwords do not match.</p></div>});
+        }
+        else {
+            axios.post(`${env.API_URL}/register`, { user, password })
+                .then(res => {
+                    if (res.success) {
+                        this.props.history.push("/login");
+                    }
+                    else {
+                        this.setState({banner: <div><p className="alert alert-danger">{res.message}</p></div>});
                     }
                 })
                 .catch(error => {
@@ -59,18 +56,20 @@ export default class Registration extends Component {
         return (
             <div>
                 <h1>Registration</h1>
-                <div id="message"></div>
+                {this.state.banner}
                 <div className="form-group">
                     <label htmlFor="user">User</label>
-                    <input type="text" className="form-control" value={this.state.username} onChange={this.state.usernameChange} />
+                    <input type="text" className="form-control" value={this.state.username} onChange={this.onUsernameChange} />
                     <label htmlFor="password">Password</label>
-                    <input type="password" className="form-control" value={this.state.password} onChange={this.passwordChange} />
+                    <input type="password" className="form-control" value={this.state.password} onChange={this.onPasswordChange} />
                     <label htmlFor="confirm-password">Confirm Password</label>
-                    <input type="password" className="form-control" value={this.state.confirmPassword} onChange={this.confirmPasswordChange} />
+                    <input type="password" className="form-control" value={this.state.confirmPassword} onChange={this.onConfirmPasswordChange} />
                 </div>
-                <button className="btn btn-success" onClick={this.register}>Register</button>
-                <p>Already have an account? Login <NavLink to="/login">here</NavLink>.</p>
+                <button className="btn btn-success" onClick={this.submit}>Register</button>
+                <p>Already have an account? Login <Link to="/login">here</Link>.</p>
             </div>
         );
     }
 }
+
+export default Register;

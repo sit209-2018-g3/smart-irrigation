@@ -6,17 +6,12 @@ class UserStore extends EventEmitter {
     constructor() {
         super()
         this.userId = "";
-        this.username = "";
         this.firstName = "";
         this.lastName = "";
     }
 
     getUserId() {
         return this.userId;
-    }
-
-    getUsername() {
-        return this.username;
     }
 
     getFirstName() {
@@ -34,11 +29,6 @@ class UserStore extends EventEmitter {
                 this.emit("change");
                 break;
             }
-            case "SET_USERNAME": {
-                this.username = action.username;
-                this.emit("change");
-                break;
-            }
             case "SET_FIRSTNAME": {
                 this.firstName = action.firstName;
                 this.emit("change");
@@ -47,6 +37,9 @@ class UserStore extends EventEmitter {
             case "SET_LASTNAME": {
                 this.lastName = action.lastName;
                 this.emit("change");
+                break;
+            }
+            default: {
                 break;
             }
         }
