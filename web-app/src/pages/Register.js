@@ -9,11 +9,15 @@ class Register extends Component {
         super()
         this.state = {
             username: '',
+            firstName: '',
+            lastName: '',
             password: '',
             confirmPassword: '',
             banner: <div></div>
         }
         this.onUsernameChange = this.onUsernameChange.bind(this);
+        this.onFirstNameChange = this.onFirstNameChange.bind(this);
+        this.onLastNameChange = this.onLastNameChange.bind(this);
         this.onPasswordChange = this.onPasswordChange.bind(this);
         this.onConfirmPasswordChange = this.onConfirmPasswordChange.bind(this);
         this.submit = this.submit.bind(this);
@@ -21,6 +25,14 @@ class Register extends Component {
 
     onUsernameChange(e) {
         this.setState({ username: e.target.value });
+    }
+
+    onFirstNameChange(e) {
+        this.setState({ firstName: e.target.value });
+    }
+
+    onLastNameChange(e) {
+        this.setState({ lastName: e.target.value });
     }
 
     onPasswordChange(e) {
@@ -32,13 +44,18 @@ class Register extends Component {
     }
 
     submit() {
-        const { user, password, confirmPassword } = this.state;
+        const { username, password, confirmPassword, firstName, lastName } = this.state;
         if (password !== confirmPassword) {
-            this.setState({banner: <div><p className="alert alert-danger">The entered passwords do not match.</p></div>});
+            this.setState({
+                password: '',
+                confirmPassword: '',
+                banner: <div><p className="alert alert-danger">The entered passwords do not match.</p></div>
+            });
         }
         else {
-            axios.post(`${env.API_URL}/register`, { user, password })
+            axios.post(`${env.API_URL}/register`, { username, password, firstName, lastName })
                 .then(res => {
+                    res = res.data;
                     if (res.success) {
                         this.props.history.push("/login");
                     }
@@ -58,11 +75,15 @@ class Register extends Component {
                 <h1>Registration</h1>
                 {this.state.banner}
                 <div className="form-group">
-                    <label htmlFor="user">User</label>
+                    <label>Username</label>
                     <input type="text" className="form-control" value={this.state.username} onChange={this.onUsernameChange} />
-                    <label htmlFor="password">Password</label>
+                    <label>First Name</label>
+                    <input type="text" className="form-control" value={this.state.firstName} onChange={this.onFirstNameChange} />
+                    <label>Last Name</label>
+                    <input type="text" className="form-control" value={this.state.lastName} onChange={this.onLastNameChange} />
+                    <label>Password</label>
                     <input type="password" className="form-control" value={this.state.password} onChange={this.onPasswordChange} />
-                    <label htmlFor="confirm-password">Confirm Password</label>
+                    <label>Confirm Password</label>
                     <input type="password" className="form-control" value={this.state.confirmPassword} onChange={this.onConfirmPasswordChange} />
                 </div>
                 <button className="btn btn-success" onClick={this.submit}>Register</button>
