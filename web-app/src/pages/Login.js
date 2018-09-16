@@ -4,6 +4,9 @@ import axios from 'axios';
 
 import * as env from "../env";
 import * as UserActions from "../actions/UserActions";
+import * as SensorActions from "../actions/SensorActions";
+import * as ControllerActions from "../actions/ControllerActions";
+
 
 class Login extends Component {
     constructor() {
@@ -35,6 +38,8 @@ class Login extends Component {
                     UserActions.setUserId(res.userId);
                     UserActions.setFirstName(res.firstName);
                     UserActions.setLastName(res.LastName);
+                    SensorActions.fetchSensors(res.userId);
+                    ControllerActions.fetchControllers(res.userId);
                     this.props.history.push("/");
                 }
                 else {
