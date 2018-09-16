@@ -59,12 +59,8 @@ app.post('/register', (req, res) => {
                     : res.json({
                         'success': true,
                         'message': 'New user created successfully.',
-                        'userId': user.userId,
-                        'firstName': user.firstName,
-                        'lastName': user.lastName,
-                        'sensors': user.sensors,
-                        'controllers': user.controllers
-                })
+                        'userId': newUser.userId
+                    })
             });
         }
     });
@@ -89,7 +85,11 @@ app.post('/authenticate', (req, res) => {
             return res.json({
                 'success': true,
                 'message': 'User authenticated successfully.',
-                'userId': user.userId
+                'userId': user.userId,
+                'firstName': user.firstName,
+                'lastName': user.lastName,
+                'sensors': user.sensors,
+                'controllers': user.controllers
             });
         }
     });
@@ -97,7 +97,7 @@ app.post('/authenticate', (req, res) => {
 
 app.post('/users/:userId/add-sensor', (req, res) => {
     const { userId } = req.params;
-    let { sensorId, sensorName } = req.body;
+    let { sensorId, sensorName, useControllerRules, rules } = req.body;
     if (!sensorId || sensorId.trim() == '' || !sensorName || sensorName.trim() == '') {
         return res.json({
             'success': false,
@@ -137,13 +137,8 @@ app.post('/users/:userId/add-sensor', (req, res) => {
                         let newSensor = {
                             sensorId,
                             sensorName,
-                            'useControllerRules': true,
-                            'rules': {
-                                'minMoisture': 0,
-                                'maxMoisture': 0,
-                                'timeStart': 0,
-                                'timeEnd': 0
-                            },
+                            useControllerRules,
+                            rules,
                             'controlMode': 'Automatic',
                             'controlState': 'Off',
                             'controllerId': '',
@@ -224,7 +219,7 @@ app.post('/users/:userId/remove-sensor', (req, res) => {
 
 app.post('/users/:userId/add-controller', (req, res) => {
     const { userId } = req.params;
-    let { controllerId, controllerName } = req.body;
+    let { controllerId, controllerName, ports, rules } = req.body;
     if (!controllerId || controllerId.trim() == '' || !controllerName || controllerName.trim() == '') {
         return res.json({
             'success': false,
@@ -264,13 +259,8 @@ app.post('/users/:userId/add-controller', (req, res) => {
                         const newController = {
                             controllerId,
                             controllerName,
-                            'ports': 1,
-                            'rules': {
-                                'minMoisture': 0,
-                                'maxMoisture': 0,
-                                'timeStart': 0,
-                                'timeEnd': 0
-                            },
+                            ports,
+                            rules,
                             'sensors': []
                         }
                         controllers.push(newController);
