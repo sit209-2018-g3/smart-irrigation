@@ -33,13 +33,13 @@ class Login extends Component {
         const { username, password } = this.state;
         axios.post(`${env.API_URL}/authenticate`, { username, password })
             .then(res => {
-                res = res.data;
-                if (res.success) {
-                    UserActions.setUserId(res.userId);
-                    UserActions.setFirstName(res.firstName);
-                    UserActions.setLastName(res.LastName);
-                    SensorActions.fetchSensors(res.userId);
-                    ControllerActions.fetchControllers(res.userId);
+                const { success, userId, firstName, lastName, sensors, controllers } = res.data;
+                if (success) {
+                    UserActions.setUserId(userId);
+                    UserActions.setFirstName(firstName);
+                    UserActions.setLastName(LastName);
+                    SensorActions.setSensors(sensors);
+                    ControllerActions.setControllers(controllers);
                     this.props.history.push("/");
                 }
                 else {
