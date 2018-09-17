@@ -4,11 +4,16 @@ class Sensor extends Component {
     render()
     {
         return (
-            <div className="row">
-                <div className="col-1">{this.props.id}</div>
-                <div className="col-3">{this.props.name}</div>
-                <div className="col-8"></div>
+            <div>
+                <div className="row">
+                    <div className="col-4">{this.props.name} [{this.props.id}]</div>
+                    <div className="col-7"></div>
+                    <div className="col-1">
+                        <Link to={"/sensors/" + this.props.id}>Edit</Link>
+                    </div>
+                </div>
             </div>
+            
         )
     }
 }
