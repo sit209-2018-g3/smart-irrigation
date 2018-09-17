@@ -6,7 +6,7 @@ import Devices from "../pages/Devices";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import AddSensor from "../pages/AddSensor";
-import Addcontroller from "../pages/AddController";
+import AddController from "../pages/AddController";
 import EditSensor from "../pages/EditSensor";
 import EditController from "../pages/EditController";
 
