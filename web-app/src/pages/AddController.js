@@ -97,7 +97,7 @@ class AddController extends Component {
     render() {
         return (
             <div>
-                <h1>Add Sensor</h1>
+                <h1>Add Controller</h1>
                 {this.state.banner}
                 <div className="form-group">
                     <label>Controller Id</label>
