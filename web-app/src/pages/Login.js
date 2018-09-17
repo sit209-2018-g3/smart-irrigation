@@ -37,7 +37,7 @@ class Login extends Component {
                 if (success) {
                     UserActions.setUserId(userId);
                     UserActions.setFirstName(firstName);
-                    UserActions.setLastName(LastName);
+                    UserActions.setLastName(lastName);
                     SensorActions.setSensors(sensors);
                     ControllerActions.setControllers(controllers);
                     this.props.history.push("/");
