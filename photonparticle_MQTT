@@ -1,9 +1,9 @@
 #include "MQTT.h"
 
-int id = 2;
-int ts = 1535359000;
 int led1 = D7;
 int sensorPin = A4;
+
+String id = "s-002";
 
 String mm;
 char* sendMoisture;
@@ -37,34 +37,32 @@ void setup() {
     client.connect("m13.cloudmqtt.com","oebptugj","yFtO2mJROP9s");
     
     if (client.isConnected()) {
-        client.subscribe("/sensor/1/config");
+        client.subscribe("/sensor/"+id+"/config");
         delay(1000);
-        client.publish("/myactuator","{ \"id\": \""+String(id)+"\"}");
+        client.publish("/mqtt-config/sensors","{ \"id\": \""+id+"\"}");
     }
 }
 
 void loop() {
+    
+    int maximum = maxRand(60);
     
     float moisture;
     int analogValue;
     analogValue = analogRead(sensorPin);
     moisture = ( (analogValue/4095.00) * 100 );
     
-    //sprintf(sendMoisture,"the percentage of water is %f",moisture);
-    
     if (client.isConnected()){
-        //client.publish("/mqtt-data/moisture","{ \"id\": \"1\",\"ts\": \"1535359000\",\"moisture\": \"30\"}");
-        client.publish("/1/"+String(id)+"/moisture",String(moisture));
+        client.publish("/mqtt-data/moisture","{ \"id\": \""+id+"\",\"moisture\": \""+String(maximum)+"\"}");
+        //client.publish("/"+mm+"/"+id+"/moisture","{ \"id\": \""+id+"\",\"moisture\": \""+String(moisture)+"\"}");
+        client.publish("/"+mm+"/"+id+"/moisture","{ \"id\": \""+id+"\",\"moisture\": \""+String(maximum)+"\"}");
+        //client.publish("/1/"+String(id)+"/moisture",String(moisture));
         client.loop();
         delay(10000);
     }
     
 }
 
-void actuator(String m) {
-    if (m=="ON"){
-        digitalWrite(led1,HIGH);
-    } else {
-        digitalWrite(led1,LOW);
-    }
+int maxRand(int maximum) {
+    return rand()%maximum+1;
 }
