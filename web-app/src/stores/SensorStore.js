@@ -9,25 +9,33 @@ class SensorStore extends EventEmitter {
     }
 
     getAll() {
-        return this.sensors;
+        return this.sensors
+            ? this.sensors
+            : []
     }
 
     getOne(sensorId) {
-        return this.sensors.find(item => {
-            return item.sensorId === sensorId;
-        });
+        return this.sensors
+            ? this.sensors.find(item => {
+                  return item.sensorId === sensorId;
+              })
+            : []
     }
 
     getLinkedTo(controllerId) {
-        return this.sensors.filter(item => {
-            return item.controllerId === controllerId;
-        });
+        return this.sensors
+            ? this.sensors.filter(item => {
+                  return item.controllerId === controllerId;
+              })
+            : []
     }
 
     getUnlinked() {
-        return this.sensors.filter(item => {
-            return item.controllerId === '';
-        });
+        return this.sensors
+            ? this.sensors.filter(item => {
+                  return item.controllerId === '';
+              })
+            : []
     }
 
     handleActions(action) {
