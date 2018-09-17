@@ -5,7 +5,7 @@
   "main": "api.js",
   "scripts": {
     "start": "nodemon -r dotenv/config api.js",
-    "deploy": "now remove 217603898-sit-209 -y && now -p && now alias"
+    "deploy": "now remove sit209-2018-g3-web-api -y && now -p && now alias"
   },
   "author": "Brenton Fleming, Lachlan McInnes",
   "license": "ISC",
