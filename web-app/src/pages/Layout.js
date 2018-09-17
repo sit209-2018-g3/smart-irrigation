@@ -7,6 +7,8 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import AddSensor from "../pages/AddSensor";
 import Addcontroller from "../pages/AddController";
+import EditSensor from "../pages/EditSensor";
+import EditController from "../pages/EditController";
 
 // Components
 import Navigation from "../components/layout/Navigation";
@@ -23,6 +25,8 @@ class Layout extends Component {
                     <Route path="/register" component={Register} />
                     <Route path="/add-sensor" component={AddSensor} />
                     <Route path="/add-controller" component={AddController} />
+                    <Route path="/sensors/:sensorId" component={EditSensor} />
+                    <Route path="/controllers/:controllerId" component={EditController} />
                     <Footer />
                 </div>
             </Router>
