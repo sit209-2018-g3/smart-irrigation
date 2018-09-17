@@ -83,7 +83,7 @@ class EditSensor extends Component {
                 timeEnd
             }
         };
-        axios.post(`${env.API_URL}/sensors/:${sensorId}/update`, params)
+        axios.post(`${env.API_URL}/sensors/${sensorId}/update`, params)
                 .then(res => {
                     const { success, message, sensors } = res.data;
                     if (success) {
@@ -110,7 +110,7 @@ class EditSensor extends Component {
                     <label>Sensor Name</label>
                     <input type="text" className="form-control" value={this.state.sensorName} onChange={this.onSensorNameChange.bind(this)} />
                     <label>Use Controller Rules</label>
-                    <input type="text" className="form-control" value={this.state.useControllerRules} onChange={this.onUseControllerRules.bind(this)} />
+                    <input type="text" className="form-control" value={this.state.useControllerRules} onChange={this.onUseControllerRulesChange.bind(this)} />
                     <label>Min Moisture</label>
                     <input type="text" className="form-control" value={this.state.minMoisture} onChange={this.onMinMoistureChange.bind(this)} />
                     <label>Max Moisture</label>

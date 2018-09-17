@@ -83,7 +83,7 @@ class EditController extends Component {
                 timeEnd
             }
         };
-        axios.post(`${env.API_URL}/controllers/:${controllerId}/update`, params)
+        axios.post(`${env.API_URL}/controllers/${controllerId}/update`, params)
                 .then(res => {
                     const { success, message, controllers } = res.data;
                     if (success) {

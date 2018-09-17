@@ -76,7 +76,7 @@ class AddController extends Component {
                 timeEnd
             }
         };
-        axios.post(`${env.API_URL}/users/:${userId}/add-controller`, params)
+        axios.post(`${env.API_URL}/users/${userId}/add-controller`, params)
                 .then(res => {
                     const { success, message, controllers } = res.data;
                     if (success) {

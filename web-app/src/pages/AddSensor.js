@@ -34,7 +34,7 @@ class AddSensor extends Component {
 
     onUseControllerRulesChange(e) {
         this.setState({
-            useControllerRules: e.target.value
+            useControllerRules: e.target.checked ? true : false
         });
     }
 
@@ -76,7 +76,7 @@ class AddSensor extends Component {
                 timeEnd
             }
         };
-        axios.post(`${env.API_URL}/users/:${userId}/add-sensor`, params)
+        axios.post(`${env.API_URL}/users/${userId}/add-sensor`, params)
                 .then(res => {
                     const { success, message, sensors } = res.data;
                     if (success) {
@@ -105,7 +105,7 @@ class AddSensor extends Component {
                     <label>Sensor Name</label>
                     <input type="text" className="form-control" value={this.state.sensorName} onChange={this.onSensorNameChange.bind(this)} />
                     <label>Use Controller Rules</label>
-                    <input type="text" className="form-control" value={this.state.useControllerRules} onChange={this.onUseControllerRules.bind(this)} />
+                    <input type="checkbox" className="form-control" onChange={this.onUseControllerRulesChange.bind(this)} checked={this.state.useControllerRules}/>
                     <label>Min Moisture</label>
                     <input type="text" className="form-control" value={this.state.minMoisture} onChange={this.onMinMoistureChange.bind(this)} />
                     <label>Max Moisture</label>
