@@ -64,7 +64,7 @@ class AddController extends Component {
 
     submit() {
         const { controllerId, controllerName, ports, minMoisture, maxMoisture, timeStart, timeEnd } = this.state;
-        const userId = sserStore.getUserId();
+        const userId = userStore.getUserId();
         const params = {
             controllerId,
             controllerName,
