@@ -5,7 +5,7 @@ import userStore from "../stores/UserStore";
 import * as SensorActions from "../actions/SensorActions";
 import * as env from "../env";
 
-class AddController extends Component {
+class AddSensor extends Component {
     constructor(props) {
         super(props)
         this.state = {
