@@ -33,7 +33,7 @@ class Login extends Component {
         const { username, password } = this.state;
         axios.post(`${env.API_URL}/authenticate`, { username, password })
             .then(res => {
-                const { success, userId, firstName, lastName, sensors, controllers } = res.data;
+                const { success, message, userId, firstName, lastName, sensors, controllers } = res.data;
                 if (success) {
                     UserActions.setUserId(userId);
                     UserActions.setFirstName(firstName);
@@ -46,7 +46,7 @@ class Login extends Component {
                     this.setState({
                         username: '',
                         password: '',
-                        banner: <div><p className="alert alert-danger">{res.message}</p></div>
+                        banner: <div><p className="alert alert-danger">{message}</p></div>
                     });
                 }
             })
