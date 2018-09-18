@@ -50,7 +50,8 @@ class Sensor extends Component {
                     </div>
                 </div>
 
-                {/* Modal -- Assign to Controller */}
+                {/*
+                Modal -- Assign to Controller
                 <div class="modal fade" id="historyModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -68,6 +69,7 @@ class Sensor extends Component {
                         </div>
                     </div>
                 </div>
+                */}
             </div>
         )
     }
