@@ -1,15 +1,28 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Modal from "react-modal";
 
 import userStore from "../../stores/UserStore";
 import * as SensorActions from "../../actions/SensorActions";
 import * as ControllerActions from "../../actions/ControllerActions";
 import * as env from "../../env";
 
-class Sensor extends Component {
-    assign() {
+Modal.setAppElement("#root")
 
+class Sensor extends Component {
+    constructor(props) {
+        super(props)
+        this.state={
+            assignModal_isOpen: false,
+            assignModal_controllerId: '',
+            assignModal_port: '',
+            plotModal_isOpen: false
+        }
+    }
+
+    assign() {
+        this.setState({ assignModal_isOpen: true })
     }
 
     delete() {
@@ -23,10 +36,10 @@ class Sensor extends Component {
                 if (success) {
                     SensorActions.setSensors(sensors);
                     ControllerActions.setControllers(controllers);
-                    this.props.setBanner(<div><p className="alert alert-success">{message}</p></div>)
+                    this.props.setBanner(<div><p className="alert alert-success banner">{message}</p></div>)
                 }
                 else {
-                    this.props.setBanner(<div><p className="alert alert-danger">{message}</p></div>)
+                    this.props.setBanner(<div><p className="alert alert-danger banner">{message}</p></div>)
                 }
             })
             .catch(err => {
@@ -34,9 +47,54 @@ class Sensor extends Component {
             })
     }
 
+    assignModal_onControllerIdChange(e) {
+        this.setState({ assignModal_controllerId: e.target.value })
+    }
+
+    assignModal_onPortChange(e) {
+        this.setState({ assignModal_port: e.target.value })
+    }
+
+    assignModal_submit() {
+        const sensorId = this.props.id;
+        const controllerId = this.state.assignModal_controllerId;
+        const controllerPort = this.state.assignModal_port;
+        const params = {
+            sensorId,
+            controllerPort
+        }
+        axios.post(`${env.API_URL}/controllers/${controllerId}/link-sensor`, params)
+            .then(res => {
+                const { success, message, sensors, controllers } = res.data;
+                if (success) {
+                    SensorActions.setSensors(sensors);
+                    ControllerActions.setControllers(controllers);
+                    this.props.setBanner(<div><p className="alert alert-success banner">{message}</p></div>);
+                }
+                else {
+                    this.props.setBanner(<div><p className="alert alert-danger banner">{`Error: ${message}`}</p></div>);
+                }
+                this.setState({assignModal_isOpen: false})
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
     render() {
+        const modalStyle={
+            content: {
+                top: '30%',
+                left: '50%',
+                right: '50%',
+                bottom: 'auto',
+                marginRight: '-50%',
+                transform: 'translate(-50%, -50%)'
+            }
+        }
         return (
             <div>
+
                 {/* Main Component */}
                 <div>
                     <div className="row">
@@ -50,26 +108,22 @@ class Sensor extends Component {
                     </div>
                 </div>
 
-                {/*
-                Modal -- Assign to Controller
-                <div class="modal fade" id="historyModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Assign to Controller</h5>
-                            </div>
-                            <div class="modal-body">
-                                <div className="form-group">
-                                    <label>Controller Id</label>
-                                    <input type="text" className="form-control" value={this.state.controllerId} onChange={this.onControllerIdChange.bind(this)} />
-                                    <label>Controller Port</label>
-                                    <input type="text" className="form-control" value={this.state.controllerPort} onChange={this.onControllerPortChange.bind(this)} />
-                                </div>
-                            </div>
-                        </div>
+                {/* Assign Modal */}
+                <Modal
+                    isOpen={this.state.assignModal_isOpen}
+                    onRequestClose={() => this.setState({ assignModal_isOpen: false })}
+                    style={modalStyle}
+                >
+                    
+                    <h2>Assign to Controller</h2>
+                    <div className="form-group">
+                        <label>Controller ID</label>
+                        <input type="text" className="form-control" value={this.state.assignModal_controllerId} onChange={this.assignModal_onControllerIdChange.bind(this)} />
+                        <label>Port</label>
+                        <input type="text" className="form-control" value={this.state.assignModal_port} onChange={this.assignModal_onPortChange.bind(this)} />
                     </div>
-                </div>
-                */}
+                    <button className="btn btn-success" id="assignModal_submit" onClick={this.assignModal_submit.bind(this)}>Assign</button>
+                </Modal>
             </div>
         )
     }
