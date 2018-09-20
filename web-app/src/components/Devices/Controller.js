@@ -1,4 +1,9 @@
 import React, { Component } from "react";
+
+/* React Components */
+import LinkedSensor from "./Controller/LinkedSensor";
+
+/* Flux Components */
 import sensorStore from "../../stores/SensorStore";
 
 class Controller extends Component {
@@ -9,7 +14,7 @@ class Controller extends Component {
         }
         this.onSensorStoreChange = this.onSensorStoreChange.bind(this);
     }
-    
+
     componentWillMount() {
         sensorStore.on("change", this.onSensorStoreChange);
     }
@@ -39,26 +44,10 @@ class Controller extends Component {
                 </div>
                 {this.state.sensors.length > 0
                     ?   this.state.sensors.map(sensor => {
-                            return <LinkedSensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} port={sensor.controllerPort} />
+                            return <LinkedSensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} port={sensor.controllerPort} setBanner={this.props.setBanner}/>
                         })
                     :   <div>No Linked Sensors</div>
                 }
-            </div>
-        )
-    }
-}
-
-class LinkedSensor extends Component {
-    
-    render() {
-        var rowStyle = {
-            'fontSize': '.8em',
-            'fontColor': '#1a1a1a'
-        }
-        return (
-            <div className="row" style={rowStyle}>
-                <div className="col-1">Port {this.props.port}:</div>
-                <div className="col-11">{this.props.name} [{this.props.id}]</div>
             </div>
         )
     }

@@ -12,10 +12,15 @@ class Devices extends Component {
         super(props)
         this.state = {
             controllers: controllerStore.getAll(),
-            sensors: sensorStore.getUnlinked()
+            sensors: sensorStore.getUnlinked(),
+            banner: <div></div>
         }
         this.onControllerStoreChange = this.onControllerStoreChange.bind(this);
         this.onSensorStoreChange = this.onSensorStoreChange.bind(this);
+    }
+
+    setBanner(banner) {
+        this.setState({ banner });
     }
 
     componentWillMount() {
@@ -49,11 +54,12 @@ class Devices extends Component {
                     userStore.getUserId() === ''
                         ? <Redirect to={{ pathname: "/login" }} />
                         : <div className="container">
+                            {this.state.banner}
                             <h2>Controllers:</h2>
                             {
                                 this.state.controllers.length > 0
                                     ? this.state.controllers.map(controller => {
-                                        return <Controller key={controller.controllerId} id={controller.controllerId} name={controller.controllerName} ports={controller.ports} />
+                                        return <Controller key={controller.controllerId} id={controller.controllerId} name={controller.controllerName} ports={controller.ports} banner={this.setBanner.bind(this)}/>
                                     })
                                     : <div>No controllers.</div>
                             }
@@ -61,7 +67,7 @@ class Devices extends Component {
                             {
                                 this.state.sensors.length > 0
                                     ? this.state.sensors.map(sensor => {
-                                        return <Sensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} />
+                                        return <Sensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} setBanner={this.setBanner.bind(this)}/>
                                     })
                                     : <div>No unlinked sensors.</div>
                             }
