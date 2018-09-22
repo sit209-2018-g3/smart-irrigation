@@ -7,8 +7,6 @@ import * as SensorActions from "../../../actions/SensorActions";
 import * as ControllerActions from "../../../actions/ControllerActions";
 
 import userStore from "../../../stores/UserStore";
-import sensorStore from "../../../stores/SensorStore";
-import controllerStore from "../../../stores/ControllerStore";
 
 class LinkedSensor extends Component {
     constructor(props) {
