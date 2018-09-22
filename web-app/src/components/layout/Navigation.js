@@ -37,29 +37,49 @@ class Navigation extends Component {
     }
 
     render() {
+        const authorisedNavBar =
+            <div className="collapse navbar-collapse" id="expanded-nav">
+                <ul className="navbar-nav mr-auto">
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/">Devices</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/add-sensor">Add Sensor</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/add-controller">Add Controller</Link>
+                    </li>
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/login" onClick={this.logout}>Logout</Link>
+                    </li>
+                </ul>
+                <span id="welcome-message">
+                    Welcome, {this.state.user}.
+                </span>
+            </div>
+
+        const unauthorisedNavBar = 
+            <div className="collapse navbar-collapse" id="expanded-nav">
+                <ul className="navbar-nav">
+                    <li className="nav-item">
+                        <Link className="nav-link" to="/login">Login</Link>
+                    </li>
+                </ul>
+            </div>
+
         return (
             <div>
-                <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                     <a className="navbar-brand" href="/">Smart Irrigation</a>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#expanded-nav">
                         <span className="navbar-toggler-icon"></span>
                     </button>
-                    <div className="collapse navbar-collapse" id="expanded-nav">
-                        {this.state.isAuthorised
-                            ?   <div className="navbar-nav">
-                                    <Link className="nav-item nav-link" to="/">Devices</Link>
-                                    <Link className="nav-item nav-link" to = "/add-sensor">Add Sensor</Link>
-                                    <Link className="nav-item nav-link" to = "/add-controller">Add Controller</Link>
-                                    <Link className="nav-item nav-link" to="/login" onClick={this.logout}>Logout</Link>
-                                </div>
-                            :   <div className="navbar-nav">
-                                    <Link className="nav-item nav-link" to="/login">Login</Link>
-                                </div>
-                        }
-                    </div>
+                    {this.state.isAuthorised
+                        ? authorisedNavBar
+                        : unauthorisedNavBar
+                    }
                 </nav>
-                
-            </div>
+            </div >
         );
     }
 }
