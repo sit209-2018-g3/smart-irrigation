@@ -1,3 +1,47 @@
+.container {
+    max-width: 1280px;
+    height: 100%;
+}
+
+h1 {
+    color: rgb(110, 110, 110);
+    margin: 20px 0;
+}
+
 .banner {
     margin: 10px auto;
+}
+
+.box {
+    border: 1px solid #343A40;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.box-title {
+    color: #fff;
+    background-color: #343A40;
+    font-weight: bold;
+}
+
+.box-content:hover {
+    background-color: #ECEDED;
+}
+
+.box-controls {
+    font-weight: normal;
+    color: inherit;
+    margin: 0 10px;
+}
+
+.box-controls:hover {
+    color: inherit;
+}
+
+.navbar {
+    padding: 10px 30px;
+}
+
+#welcome-message {
+    color: #fff;
 }
