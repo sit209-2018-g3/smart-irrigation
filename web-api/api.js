@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 
 // import models
 const User = require('./models/user')
-const SensorData = require('./models/sensor-data')
+const Sensor = require('./models/sensor')
 
 // define app
 const app = express();
@@ -655,7 +655,7 @@ app.post('/users/:userId/update', (req, res) => {
 
 app.get('/sensors/:sensorId/data', (req, res) => {
     const { sensorId } = req.params;
-    SensorData.findOne({ sensorId }, (err, sensor) => {
+    Sensor.findOne({ sensorId }, (err, sensor) => {
        if (err || !sensor) {
            return err
             ? res.json({
@@ -668,7 +668,7 @@ app.get('/sensors/:sensorId/data', (req, res) => {
             });
        }
        else {
-           let { data } = sensor.data;
+           let { data } = sensor;
            return res.json({
                'success': true,
                'message': 'Successfully retrieved sensor data.',
