@@ -15,12 +15,17 @@ class Devices extends Component {
             sensors: sensorStore.getUnlinked(),
             banner: <div></div>
         }
+        this.bannerTimeout = null;
         this.onControllerStoreChange = this.onControllerStoreChange.bind(this);
         this.onSensorStoreChange = this.onSensorStoreChange.bind(this);
     }
 
     setBanner(banner) {
+        if (this.bannerTimeout) {
+            clearTimeout(this.bannerTimeout);
+        }
         this.setState({ banner });
+        this.bannerTimeout = setTimeout(() => {this.setState({banner: <div></div>})}, 5000)
     }
 
     componentWillMount() {
