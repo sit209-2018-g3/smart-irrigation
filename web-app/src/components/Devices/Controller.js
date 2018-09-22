@@ -33,7 +33,7 @@ class Controller extends Component {
         if (portA < portB) {
             return -1;
         }
-        else if (portA == portB) {
+        else if (portA === portB) {
             return 0;
         }
         else {
