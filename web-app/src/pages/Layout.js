@@ -18,15 +18,17 @@ class Layout extends Component {
     render() {
         return (
             <Router>
-                <div className="container">
-                    <Navigation history={Router.history}/>
-                    <Route exact path="/" component={Devices} />
-                    <Route path="/login" component={Login} />
-                    <Route path="/register" component={Register} />
-                    <Route path="/add-sensor" component={AddSensor} />
-                    <Route path="/add-controller" component={AddController} />
-                    <Route path="/sensors/:sensorId" component={EditSensor} />
-                    <Route path="/controllers/:controllerId" component={EditController} />
+                <div>
+                    <Navigation history={Router.history} />
+                    <div className="container">
+                        <Route exact path="/" component={Devices} />
+                        <Route path="/login" component={Login} />
+                        <Route path="/register" component={Register} />
+                        <Route path="/add-sensor" component={AddSensor} />
+                        <Route path="/add-controller" component={AddController} />
+                        <Route path="/sensors/:sensorId" component={EditSensor} />
+                        <Route path="/controllers/:controllerId" component={EditController} />
+                    </div>
                     <Footer />
                 </div>
             </Router>
