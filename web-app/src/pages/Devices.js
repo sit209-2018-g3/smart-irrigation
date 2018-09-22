@@ -53,23 +53,23 @@ class Devices extends Component {
                 {
                     userStore.getUserId() === ''
                         ? <Redirect to={{ pathname: "/login" }} />
-                        : <div className="container">
+                        : <div>
                             {this.state.banner}
-                            <h2>Controllers:</h2>
+                            <h1>Controllers</h1>
                             {
                                 this.state.controllers.length > 0
                                     ? this.state.controllers.map(controller => {
-                                        return <Controller key={controller.controllerId} id={controller.controllerId} name={controller.controllerName} ports={controller.ports} banner={this.setBanner.bind(this)}/>
+                                        return <Controller key={controller.controllerId} id={controller.controllerId} name={controller.controllerName} ports={controller.ports} setBanner={this.setBanner.bind(this)}/>
                                     })
-                                    : <div>No controllers.</div>
+                                    : <p>No controllers.</p>
                             }
-                            <h2>Unlinked Sensors:</h2>
+                            <h1>Unassigned Sensors</h1>
                             {
                                 this.state.sensors.length > 0
                                     ? this.state.sensors.map(sensor => {
                                         return <Sensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} setBanner={this.setBanner.bind(this)}/>
                                     })
-                                    : <div>No unlinked sensors.</div>
+                                    : <p className="text-center">No unassigned sensors.</p>
                             }
                         </div>
 

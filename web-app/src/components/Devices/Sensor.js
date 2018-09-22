@@ -1,11 +1,17 @@
+/* Libraries */
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Modal from "react-modal";
 
+/* Stores */
 import userStore from "../../stores/UserStore";
+
+/* Actions */
 import * as SensorActions from "../../actions/SensorActions";
 import * as ControllerActions from "../../actions/ControllerActions";
+
+/* Constants */
 import * as env from "../../env";
 
 Modal.setAppElement("#root")
@@ -13,12 +19,17 @@ Modal.setAppElement("#root")
 class Sensor extends Component {
     constructor(props) {
         super(props)
-        this.state={
+        this.state = {
             assignModal_isOpen: false,
             assignModal_controllerId: '',
             assignModal_port: '',
             plotModal_isOpen: false
         }
+        this.assign = this.assign.bind(this);
+        this.delete = this.delete.bind(this);
+        this.assignModal_onControllerIdChange = this.assignModal_onControllerIdChange.bind(this);
+        this.assignModal_onPortChange = this.assignModal_onPortChange.bind(this);
+        this.assignModal_submit = this.assignModal_submit.bind(this);
     }
 
     assign() {
@@ -36,7 +47,6 @@ class Sensor extends Component {
                 if (success) {
                     SensorActions.setSensors(sensors);
                     ControllerActions.setControllers(controllers);
-                    this.props.setBanner(<div><p className="alert alert-success banner">{message}</p></div>)
                 }
                 else {
                     this.props.setBanner(<div><p className="alert alert-danger banner">{message}</p></div>)
@@ -69,12 +79,11 @@ class Sensor extends Component {
                 if (success) {
                     SensorActions.setSensors(sensors);
                     ControllerActions.setControllers(controllers);
-                    this.props.setBanner(<div><p className="alert alert-success banner">{message}</p></div>);
                 }
                 else {
                     this.props.setBanner(<div><p className="alert alert-danger banner">{`Error: ${message}`}</p></div>);
                 }
-                this.setState({assignModal_isOpen: false})
+                this.setState({ assignModal_isOpen: false })
             })
             .catch(err => {
                 console.log(err);
@@ -82,7 +91,7 @@ class Sensor extends Component {
     }
 
     render() {
-        const modalStyle={
+        const modalStyle = {
             content: {
                 top: '30%',
                 left: '50%',
@@ -97,15 +106,17 @@ class Sensor extends Component {
 
                 {/* Main Component */}
                 <div>
-                    <div className="row">
-                        <div className="col-4">{this.props.name} [{this.props.id}]</div>
-                        <div className="col-5"></div>
-                        <div className="col-3">
-                            <a href="#" onClick={this.assign.bind(this)} style={{ margin: "0 5px" }}>Assign</a>
-                            <Link to={"/sensors/" + this.props.id} style={{ margin: "0 5px" }}>Edit</Link>
-                            <a href="#" onClick={this.delete.bind(this)} style={{ margin: "0 5px" }}>Delete</a>
-                        </div>
-                    </div>
+                    <table width="100%" cellpadding="5">
+                        <tr className="box-content">
+                            <td width="40%">{this.props.name} [{this.props.id}]</td>
+                            <td width="60%" className="text-right">
+                                <a href="#" className="box-controls">View Data</a>
+                                <a href="#" className="box-controls" onClick={this.assign}>Assign</a>
+                                <Link to={"/sensors/" + this.props.id} className="box-controls">Edit</Link>
+                                <a href="#" className="box-controls" onClick={this.delete}>Delete</a>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 {/* Assign Modal */}
@@ -114,15 +125,15 @@ class Sensor extends Component {
                     onRequestClose={() => this.setState({ assignModal_isOpen: false })}
                     style={modalStyle}
                 >
-                    
+
                     <h2>Assign to Controller</h2>
                     <div className="form-group">
                         <label>Controller ID</label>
-                        <input type="text" className="form-control" value={this.state.assignModal_controllerId} onChange={this.assignModal_onControllerIdChange.bind(this)} />
+                        <input type="text" className="form-control" value={this.state.assignModal_controllerId} onChange={this.assignModal_onControllerIdChange} />
                         <label>Port</label>
-                        <input type="text" className="form-control" value={this.state.assignModal_port} onChange={this.assignModal_onPortChange.bind(this)} />
+                        <input type="text" className="form-control" value={this.state.assignModal_port} onChange={this.assignModal_onPortChange} />
                     </div>
-                    <button className="btn btn-success" id="assignModal_submit" onClick={this.assignModal_submit.bind(this)}>Assign</button>
+                    <button className="btn btn-success" id="assignModal_submit" onClick={this.assignModal_submit}>Assign</button>
                 </Modal>
             </div>
         )

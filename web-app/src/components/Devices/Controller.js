@@ -1,18 +1,44 @@
+/* Libraries */
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-/* React Components */
+/* Components */
 import LinkedSensor from "./Controller/LinkedSensor";
 
-/* Flux Components */
+/* Stores */
 import sensorStore from "../../stores/SensorStore";
+import userStore from "../../stores/UserStore";
+
+/* Actions */
+import * as SensorActions from "../../actions/SensorActions";
+import * as ControllerActions from "../../actions/ControllerActions";
+
+/* Constants */
+import * as env from "../../env";
 
 class Controller extends Component {
     constructor(props) {
         super (props)
         this.state = {
-            sensors: sensorStore.getLinkedTo(this.props.id)
+            sensors: sensorStore.getLinkedTo(this.props.id).sort(this.sensorPortComparer)
         }
         this.onSensorStoreChange = this.onSensorStoreChange.bind(this);
+        this.delete = this.delete.bind(this)
+    }
+
+    sensorPortComparer(a, b) {
+        let portA = a.controllerPort || 0;
+        let portB = b.controllerPort || 0;
+        if (portA < portB) {
+            return -1;
+        }
+        else if (portA == portB) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
     }
 
     componentWillMount() {
@@ -25,29 +51,50 @@ class Controller extends Component {
 
     onSensorStoreChange() {
         this.setState({
-            sensors: sensorStore.getLinkedTo(this.props.id)
+            sensors: sensorStore.getLinkedTo(this.props.id).sort(this.sensorPortComparer)
         })
+    }
+
+    delete() {
+        const userId = userStore.getUserId();
+        const params = {
+            controllerId: this.props.id
+        }
+        axios.post(`${env.API_URL}/users/${userId}/remove-controller`, params)
+            .then(res => {
+                const { success, message, sensors, controllers } = res.data;
+                if (success) {
+                    SensorActions.setSensors(sensors);
+                    ControllerActions.setControllers(controllers);
+                }
+                else {
+                    this.props.setBanner(<div><p className="alert alert-danger banner">{message}</p></div>)
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     render()
     {
-        var rowStyle = {
-            'fontWeight': 'bold'
-        }
         return (
             <div>
-                <div className="row" style={rowStyle}>
-                    <div className="col-4">{this.props.name} [{this.props.id}]</div>
-                    <div className="col-4"></div>
-                    <div className="col-1">{this.props.ports} Port{this.props.port > 1 ? 's' : ''}</div>
-                    <div className="col-3">{this.state.sensors.length} Linked Sensor{this.state.sensors.length === 1 ? '' : 's'}</div>
-                </div>
+                <table className="box" cellpadding="5">
+                    <tr className="box-title">
+                        <th width="40%">{this.props.name} [{this.props.id}]</th>
+                        <th width="60%" className="text-right">
+                            <Link className="box-controls" to={`/controllers/${this.props.id}/edit`}>Edit</Link>
+                            <a className="box-controls" onClick={this.delete} href="#">Delete</a>
+                        </th>
+                    </tr>
                 {this.state.sensors.length > 0
                     ?   this.state.sensors.map(sensor => {
-                            return <LinkedSensor key={sensor.sensorId} id={sensor.sensorId} name={sensor.sensorName} port={sensor.controllerPort} setBanner={this.props.setBanner}/>
+                            return <LinkedSensor key={sensor.sensorId} sensor={sensor} setBanner={this.props.setBanner}/>
                         })
-                    :   <div>No Linked Sensors</div>
+                    :   <td colspan="2" className="text-center">No Linked Sensors</td>
                 }
+                </table>
             </div>
         )
     }
