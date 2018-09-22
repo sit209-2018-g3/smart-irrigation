@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 
 // import models
 const User = require('./models/user')
@@ -144,6 +145,7 @@ app.post('/users/:userId/add-sensor', (req, res) => {
                             'controllerId': '',
                             'controllerPort': 0
                         }
+                        pushSensorConfig(newSensor.sensorId);
                         sensors.push(newSensor);
                         user.sensors = sensors;
                         user.save(err => {
@@ -196,6 +198,7 @@ app.post('/users/:userId/remove-sensor', (req, res) => {
                     controller.sensors = controller.sensors.filter( item => {
                         return item != sensorId;
                     });
+                    pushControllerConfig(controller.controllerId);
                 }
             }
             user.sensors = sensors;
@@ -263,6 +266,7 @@ app.post('/users/:userId/add-controller', (req, res) => {
                             rules,
                             'sensors': []
                         }
+                        pushControllerConfig(newController.controllerId);
                         controllers.push(newController);
                         user.controllers = controllers;
                         user.save(err => {
@@ -322,6 +326,7 @@ app.post('/users/:userId/remove-controller', (req, res) => {
                     if (sensor.controllerId == controllerId) {
                         sensor.controllerId = '';
                         sensor.controllerPort = 0;
+                        pushSensorConfig(sensor.sensorId);
                     }
                 }
                 user.sensors = sensors;
@@ -369,6 +374,7 @@ app.post('/sensors/:sensorId/update', (req, res) => {
                     sensor.rules = rules;
                     sensor.controlMode = controlMode;
                     sensor.controlSate = controlState;
+                    pushSensorConfig(sensor.sensorId);
                     break;
                 }
             }
@@ -411,6 +417,7 @@ app.post('/controllers/:controllerId/update', (req, res) => {
                     controller.controllerName = controllerName;
                     controller.ports = ports;
                     controller.rules = rules;
+                    pushControllerConfig(controllerId);
                     break;
                 }
             }
@@ -452,15 +459,14 @@ app.post('/controllers/:controllerId/link-sensor', (req, res) => {
                 if ( sensor.sensorId == sensorId ) {
                     sensor.controllerId = controllerId;
                     sensor.controllerPort = controllerPort;
+                    pushSensorConfig(sensor.sensorId);
                     for (controller of controllers) {
-                        if (controller.controllerId == controllerId && !controller.sensors.includes(sensorId)) {
-                            controller.sensors.push(sensorId);
+                        if (controller.controllerId == controllerId) {
+                            if (!controller.sensors.includes(sensorId)) {
+                                controller.sensors.push(sensorId);
+                            }
                         }
-                        else if (controller.sensors.includes(sensorId)) {
-                            controller.sensors = controller.sensors.filter(item => {
-                                return item != sensorId;
-                            })
-                        }
+                        pushControllerConfig(controller.controllerId);
                     }
                     sensorFound = true;
                     break;
@@ -513,6 +519,7 @@ app.post('/sensors/:sensorId/unlink', (req, res) => {
                 if (sensor.sensorId == sensorId) {
                     sensor.controllerId = '';
                     sensor.controllerPort = 0;
+                    pushSensorConfig(sensor.sensorId);
                     break;
                 }
             }
@@ -521,6 +528,7 @@ app.post('/sensors/:sensorId/unlink', (req, res) => {
                     controller.sensors = controller.sensors.filter(item => {
                         return item != sensorId;
                     })
+                    pushControllerConfig(controller.controllerId);
                 }
             }
             user.sensors = sensors;
@@ -682,3 +690,11 @@ app.get('/sensors/:sensorId/data', (req, res) => {
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 });
+
+function pushControllerConfig(controllerId) {
+    axios.get(`${process.env.MQTT_API}/controllers/${controllerId}/push-config`)
+}
+
+function pushSensorConfig(sensorId) {
+    axios.get(`${process.env.MQTT_API}/sensors/${sensorId}/push-config`)
+}
