@@ -9,13 +9,17 @@ class ControllerStore extends EventEmitter {
     }
 
     getAll() {
-        return this.controllers;
+        return this.controllers
+            ? this.controllers
+            : [];
     }
 
     getOne(controllerId) {
-        return this.controllers.find(item => {
-            return item.controllerId === controllerId;
-        });
+        return this.controllers
+            ? this.controllers.find(item => {
+                return item.controllerId === controllerId;
+            })
+            : []
     }
 
     handleActions(action) {
