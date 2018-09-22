@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Modal from "react-modal";
+import Plot from "react-plotly.js";
 
 /* Stores */
 import userStore from "../../stores/UserStore";
@@ -23,13 +24,41 @@ class Sensor extends Component {
             assignModal_isOpen: false,
             assignModal_controllerId: '',
             assignModal_port: '',
+            plotX: [],
+            plotY: [],
             plotModal_isOpen: false
         }
+        this.viewData = this.viewData.bind(this);
         this.assign = this.assign.bind(this);
         this.delete = this.delete.bind(this);
         this.assignModal_onControllerIdChange = this.assignModal_onControllerIdChange.bind(this);
         this.assignModal_onPortChange = this.assignModal_onPortChange.bind(this);
         this.assignModal_submit = this.assignModal_submit.bind(this);
+    }
+
+    viewData() {
+        const sensorId = this.props.id;
+        axios.get(`${env.API_URL}/sensors/${sensorId}/data`)
+            .then(res => {
+                const { success, message, data } = res.data;
+                if (success) {
+                    let x = [];
+                    let y = [];
+                    for (let row of data)
+                    {
+                        x.push(new Date(row.ts));
+                        y.push(row.moisture);
+                    }
+                    this.setState({ 
+                        plotX: x,
+                        plotY: y,
+                        plotModal_isOpen: true
+                    })
+                }
+                else {
+                    this.props.setBanner(<div><p className="alert alert-danger banner">{message}</p></div>)
+                }
+            })
     }
 
     assign() {
@@ -110,7 +139,7 @@ class Sensor extends Component {
                         <tr className="box-content">
                             <td width="40%">{this.props.name} [{this.props.id}]</td>
                             <td width="60%" className="text-right">
-                                <a href="#" className="box-controls">View Data</a>
+                                <a href="#" className="box-controls" onClick={this.viewData}>View Data</a>
                                 <a href="#" className="box-controls" onClick={this.assign}>Assign</a>
                                 <Link to={"/sensors/" + this.props.id} className="box-controls">Edit</Link>
                                 <a href="#" className="box-controls" onClick={this.delete}>Delete</a>
@@ -135,6 +164,30 @@ class Sensor extends Component {
                     </div>
                     <button className="btn btn-success" id="assignModal_submit" onClick={this.assignModal_submit}>Assign</button>
                 </Modal>
+
+                {/* Plot Modal */}
+                <Modal
+                    isOpen={this.state.plotModal_isOpen}
+                    onRequestClose={() => this.setState({ plotModal_isOpen: false })}
+                    style={modalStyle}
+                >
+
+                    <Plot
+                        data={[
+                            {
+                                type: "scatter",
+                                mode: "lines",
+                                name: "Moisture",
+                                x: this.state.plotX,
+                                y: this.state.plotY,
+                                line: { color: '#17BECF' },
+                            }
+                        ]}
+                        layout={{ title: `${this.props.name} [${this.props.id}] - Data` }}
+                    />
+
+                </Modal>
+
             </div>
         )
     }
