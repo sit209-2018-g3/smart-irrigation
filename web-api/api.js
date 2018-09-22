@@ -533,7 +533,9 @@ app.post('/sensors/:sensorId/unlink', (req, res) => {
                     })
                     : res.json({
                         'success': true,
-                        'message': 'Sensor successfully unlinked.'
+                        'message': 'Sensor successfully unlinked.',
+                        sensors,
+                        controllers
                     });
             });
         }
