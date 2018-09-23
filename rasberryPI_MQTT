@@ -1,23 +1,32 @@
 import paho.mqtt.client as mqtt
 import RPi.GPIO as GPIO
 import time, json, chardet
+import datetime
 
 # define constants
-DEVICE_ID = "c-003"
+DEVICE_ID = "c-001"
 DEVICE_PORTS = 4
 MQTT_SERVER = "m13.cloudmqtt.com"
 
 # configure RPi I/O
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(10, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(12, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(16, GPIO.OUT, initial = GPIO.LOW)
+GPIO.setup(18, GPIO.OUT, initial = GPIO.LOW)
 
 #port and pin dictionary
 pinDict = {1:10,2:12,3:16, 4:18}
-sensDict = {}
+portDict = {}
+minMoistDict = {}
+maxMoistDict = {}
+minTimeDict = {}
+maxTimeDict = {}
 
 # initialise device config
+global deviceConfig
+
 deviceConfig = []
 
 def get_config(client):
@@ -35,29 +44,53 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     topic = msg.topic
     data = json.loads(msg.payload.decode("utf-8"))
+    
 
     # --- CONFIG MESSAGE RECEIVED ---
     if topic == "/actuator/"+DEVICE_ID+"/config":
         
+        try:
+            for i in deviceConfig:
+                try:
+                    print("unsubscribed to "+i)
+                    client.unsubscribe(i)
+                except:
+                    pass
+        except:
+            pass
+        
+                
         print("message recieved")
-        print(data)
+        print(data[0])
         print(topic)
         
-        sensDict.clear()
+        deviceConfig = []
+        
+        portDict.clear()
+        minMoistDict.clear()
+        maxMoistDict.clear()
+        minTimeDict.clear()
+        maxTimeDict.clear()
 
         # subscribe sensor channels
         try:
             # subscribe all sensor channels
             for sensor in data:
-                deviceConfig.append(("/" + DEVICE_ID + "/" + sensor['sensor'] + "/moisture",0))
-                print("subscribed to /" + DEVICE_ID + "/" + sensor['sensor'] + "/moisture")
+                deviceConfig.append(("/" + DEVICE_ID + "/" + sensor['sensorId'] + "/moisture",0))
+
+                print("subscribed to /" + DEVICE_ID + "/" + sensor['sensorId'] + "/moisture")
                 
-                sensDict[sensor['sensor']]=sensor['port']
+                portDict[sensor['sensorId']]=sensor['port']
+                minMoistDict[sensor['sensorId']]=sensor['rules']['minMoisture']
+                maxMoistDict[sensor['sensorId']]=sensor['rules']['maxMoisture']
+                minTimeDict[sensor['sensorId']]=sensor['rules']['timeStart']
+                maxTimeDict[sensor['sensorId']]=sensor['rules']['timeEnd']
                 
             client.subscribe(deviceConfig)
                 
         except:
             pass
+        
         
     # --- DATA MESSAGE RECEIVED ---
     else:
@@ -65,11 +98,24 @@ def on_message(client, userdata, msg):
             
             # extract sensor id from topic
             sensorId = topic.split('/')[2]
-            port = sensDict.get(sensorId)
+            port = portDict.get(sensorId)
+            minMoist = minMoistDict.get(sensorId)
+            maxMoist = maxMoistDict.get(sensorId)
+            minTime = minTimeDict.get(sensorId)
+            maxTime = maxTimeDict.get(sensorId)
             
-            if float(data['moisture']) > 25:
-                GPIO.output(pinDict.get(port), GPIO.HIGH)
-                print("hello")
+            checkTime = '%s%s'%(format(datetime.datetime.now().hour,"02"),format(datetime.datetime.now().minute,"02"))
+            print (checkTime)
+            
+            if float(data['moisture']) < minMoist:
+                if float(checkTime) > float(minTime) and float(checkTime) < float(maxTime):
+                    print(sensorId+" - turned water on")
+                    GPIO.output(pinDict.get(port), 1)
+            elif float(data['moisture']) > maxMoist:
+                print(sensorId+" - turned water off")
+                GPIO.output(pinDict.get(port), 0)
+            else:
+                print(sensorId+" - do nothing")
 
         except:
             pass
@@ -81,3 +127,4 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 client.loop_forever()
+
