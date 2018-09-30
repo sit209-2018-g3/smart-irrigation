@@ -33,7 +33,7 @@ class LinkedSensor extends Component {
                     let x = [];
                     let y = [];
                     for (let row of data) {
-                        if (y > 0.5) {
+                        if (row.moisture > 0.5) {
                             x.push(new Date(row.ts));
                             y.push(row.moisture);
                         }
