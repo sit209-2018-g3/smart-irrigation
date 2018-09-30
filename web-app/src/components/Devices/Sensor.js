@@ -46,8 +46,10 @@ class Sensor extends Component {
                     let y = [];
                     for (let row of data)
                     {
-                        x.push(new Date(row.ts));
-                        y.push(row.moisture);
+                        if (y > 0.5) {
+                            x.push(new Date(row.ts));
+                            y.push(row.moisture);
+                        }
                     }
                     this.setState({ 
                         plotX: x,
